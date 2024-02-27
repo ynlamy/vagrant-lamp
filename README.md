@@ -1,12 +1,13 @@
 # vagrant-lamp
 
-A LAMP environment with [Vagrant](https://www.vagrantup.com/) using [VMware Workstation](https://www.vmware.com/) created by Yoann LAMY under the terms of the [GNU General Public License v3](http://www.gnu.org/licenses/gpl.html).
+A LAMP development environment with [Vagrant](https://www.vagrantup.com/) using [VMware Workstation](https://www.vmware.com/) created by Yoann LAMY under the terms of the [GNU General Public License v3](http://www.gnu.org/licenses/gpl.html).
 
 This LAMP environment is based on a [Rocky Linux 9](https://rockylinux.org/) distribution and contains :
 * An [Apache/httpd](https://httpd.apache.org/) web server
 * A [MariaDB](https://mariadb.org/) server
 * [PHP](https://www.php.net) scripting language
 * [phpMyAdmin](https://www.phpmyadmin.net/) to handle the administration of MySQL over the Web
+* [Composer](https://getcomposer.org/) to manage dependencies in PHP
 
 The php version and some PHP parameters can be defined through the ``Vagrantfile``.
 
@@ -43,6 +44,7 @@ This LAMP environment must be started using Vagrant.
     default: Cleaning dnf cache...
     default: Updating the system...
     default: Installing LAMP...
+    default: Installing Composer...    
     default: Configuring Apache/httpd...
     default: Configuring MariaDB...
     default: Configuring PHP...
@@ -55,6 +57,7 @@ This LAMP environment must be started using Vagrant.
     default: - MariaDB version : 10.5.22
     default: - PHP version : 8.2.16
     default: - phpMyAdmin version : 5.2.1
+    default: - Composer version : 2.7.1    
     default:
     default: Informations :
     default: - Web server URL : http://127.0.0.1/

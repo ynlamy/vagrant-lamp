@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Description : A LAMP environment with Vagrant using VMware Workstation
+# Description : A LAMP development environment with Vagrant using VMware Workstation
 # Author : Yoann LAMY <https://github.com/ynlamy/vagrant-lamp>
 # Licence : GPLv3
 
@@ -24,6 +24,12 @@ dnf -y -q install https://rpms.remirepo.net/enterprise/remi-release-9.rpm &>/dev
 crb enable &>/dev/null
 dnf -y -q module enable php:remi-$PHP_VERSION &>/dev/null
 dnf -y -q install mariadb-server httpd php php-bz2 php-gd php-intl php-mbstring php-mysqlnd php-ldap php-zip phpMyAdmin &>/dev/null
+
+echo "Installing Composer..."
+curl -s -o composer-setup.php https://getcomposer.org/installer &>/dev/null
+php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer &>/dev/null
+rm -f composer-setup.php
+export COMPOSER_ALLOW_SUPERUSER=1
 
 echo "Configuring Apache/httpd..."
 mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
@@ -70,6 +76,7 @@ echo "- Apache/httpd version :" `dnf info httpd | grep -i "Version" | awk '{ pri
 echo "- MariaDB version :" `dnf info mariadb-server | grep -i "Version" | awk '{ print $3 }'`
 echo "- PHP version :" `dnf info php | grep -i "Version" | awk '{ print $3 }'`
 echo "- phpMyAdmin version :" `dnf info phpMyAdmin | grep -i "Version" | awk '{ print $3 }'`
+echo "- Composer version :" `/usr/local/bin/composer -V | awk '{ print $3 }'`
 echo -e "\nInformations :"
 echo "- Web server URL : http://127.0.0.1/"
 echo "- phpinfo URL : http://127.0.0.1/phpinfo/"

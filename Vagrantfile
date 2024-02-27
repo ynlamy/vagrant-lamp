@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Description : A LAMP environment with Vagrant using VMware Workstation
+# Description : A LAMP development environment with Vagrant using VMware Workstation
 # Author : Yoann LAMY <https://github.com/ynlamy/vagrant-lamp>
 # Licence : GPLv3
 
