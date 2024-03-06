@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
 
   # Forwarded port for HTTP
   config.vm.network "forwarded_port", guest: 80, host: 80, host_ip: "127.0.0.1"
-  
+
   # Forwarded port for MariaDB
   config.vm.network "forwarded_port", guest: 3306, host: 3306, host_ip: "127.0.0.1"
 
@@ -51,6 +51,9 @@ Vagrant.configure("2") do |config|
     "PHP_MEMORY_LIMIT" => "128M", # This sets the maximum amount of memory in bytes that a script is allowed to allocate
     "PHP_UPLOAD_MAX_FILESIZE" => "2M", # The maximum size of an uploaded file
     "PHP_POST_MAX_SIZE" => "8M", # Sets max size of post data allowed
-    "PHP_MAX_EXECUTION_TIME" => "30" # This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser
+    "PHP_MAX_EXECUTION_TIME" => "120", # This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser
+    "PHP_XDEBUG_MODE" => "debug", # This setting controls which Xdebug features are enabled (off, develop, coverage, debug, gcstats, profile, trace)
+    "PHP_XDEBUG_CLIENT_HOST" => "192.168.2.1", # Configures the IP address or hostname where Xdebug will attempt to connect to when initiating a debugging connection
+    "PHP_XDEBUG_START_WITH_REQUEST" => "default" # A Function Trace, Garbage Collection Statistics, Profiling, or Step Debugging can be activated at the start of a PHP request (yes, no, trigger, default)
   }
 end

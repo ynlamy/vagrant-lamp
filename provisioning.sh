@@ -23,7 +23,7 @@ dnf -y -q install epel-release &>/dev/null
 dnf -y -q install https://rpms.remirepo.net/enterprise/remi-release-9.rpm &>/dev/null
 crb enable &>/dev/null
 dnf -y -q module enable php:remi-$PHP_VERSION &>/dev/null
-dnf -y -q install mariadb-server httpd php php-bz2 php-gd php-intl php-mbstring php-mysqlnd php-ldap php-zip phpMyAdmin &>/dev/null
+dnf -y -q install mariadb-server httpd php php-bz2 php-gd php-intl php-mbstring php-mysqlnd php-ldap php-zip php-xdebug phpMyAdmin &>/dev/null
 
 echo "Installing Composer..."
 curl -s -o composer-setup.php https://getcomposer.org/installer &>/dev/null
@@ -50,6 +50,9 @@ sed -i "s/upload_max_filesize = .*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESI
 sed -i "s/post_max_size = .*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php.ini
 sed -i "s/max_execution_time = .*/max_execution_time = ${PHP_MAX_EXECUTION_TIME}/" /etc/php.ini
 sed -i "s#;date.timezone .*#date.timezone = ${TIMEZONE}#" /etc/php.ini
+sed -i "s/;xdebug.mode = .*/xdebug.mode = ${PHP_XDEBUG_MODE}/" /etc/php.d/15-xdebug.ini
+sed -i "s/;xdebug.client_host = .*/xdebug.client_host = ${PHP_XDEBUG_CLIENT_HOST}/" /etc/php.d/15-xdebug.ini
+sed -i "s/;xdebug.start_with_request = .*/xdebug.start_with_request = ${PHP_XDEBUG_START_WITH_REQUEST}/" /etc/php.d/15-xdebug.ini
 
 echo "Configuring phpinfo..."
 echo -e "Alias /phpinfo /usr/share/phpinfo\n\n<Directory /usr/share/phpinfo>\n  Require all granted\n</Directory>" > /etc/httpd/conf.d/phpinfo.conf
