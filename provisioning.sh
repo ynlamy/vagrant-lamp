@@ -79,7 +79,7 @@ echo "- Apache/httpd version :" `dnf info httpd | grep -i "Version" | awk '{ pri
 echo "- MariaDB version :" `dnf info mariadb-server | grep -i "Version" | awk '{ print $3 }'`
 echo "- PHP version :" `dnf info php | grep -i "Version" | awk '{ print $3 }'`
 echo "- phpMyAdmin version :" `dnf info phpMyAdmin | grep -i "Version" | awk '{ print $3 }'`
-echo "- Composer version :" `/usr/local/bin/composer -V | awk '{ print $3 }'`
+echo "- Composer version :" `/usr/local/bin/composer -V 2> /dev/null | grep -i "Composer version" | awk '{ print $3 }'`
 echo -e "\nInformations :"
 echo "- Web server URL : http://127.0.0.1/"
 echo "- phpinfo URL : http://127.0.0.1/phpinfo/"
