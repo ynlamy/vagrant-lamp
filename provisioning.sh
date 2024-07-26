@@ -26,6 +26,7 @@ dnf -y -q module enable php:remi-$PHP_VERSION &>/dev/null
 dnf -y -q install mariadb-server httpd php php-bz2 php-gd php-intl php-mbstring php-mysqlnd php-ldap php-zip php-xdebug phpMyAdmin &>/dev/null
 
 echo "Installing Composer..."
+dnf -y -q install unzip &>/dev/null
 curl -s -o composer-setup.php https://getcomposer.org/installer &>/dev/null
 php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer &>/dev/null
 rm -f composer-setup.php
