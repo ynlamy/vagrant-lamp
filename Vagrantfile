@@ -44,7 +44,7 @@ Vagrant.configure("2") do |config|
   # Provisioning script
   config.vm.provision "shell", path: "provisioning.sh", env: {
     "TIMEZONE" => "Europe/Paris", # Timezone to be used by the system and PHP
-    "PHP_VERSION" => "8.2", # PHP version to use (currently : 7.4, 8.0, 8.1, 8.2, 8.3)
+    "PHP_VERSION" => "8.2", # PHP version to use (currently : 7.4, 8.0, 8.1, 8.2, 8.3, 8.4)
     "PHP_ERROR_REPORTING" => "E_ALL", # Sets which PHP errors are reported
     "PHP_DISPLAY_ERRORS" => "On", # This determines whether errors should be printed to the screen as part of the output
     "PHP_DISPLAY_STARTUP_ERRORS" => "On", #Even when display_errors is on, errors that occur during PHP's startup sequence are not displayed
