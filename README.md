@@ -7,7 +7,7 @@ This LAMP environment is based on a [Rocky Linux 9](https://rockylinux.org/) dis
 * A [MariaDB](https://mariadb.org/) server
 * [PHP](https://www.php.net) scripting language
 * [Xdebug](https://xdebug.org/) to provides a range of features to improve the PHP development experience
-* [phpMyAdmin](https://www.phpmyadmin.net/) to handle the administration of MySQL over the Web
+* [phpMyAdmin](https://www.phpmyadmin.net/) to handle the administration of MySQL/MariaDB over the Web
 * [Composer](https://getcomposer.org/) to manage dependencies in PHP
 
 The php version and some PHP parameters can be defined through the ``Vagrantfile``.
@@ -22,7 +22,9 @@ The php version and some PHP parameters can be defined through the ``Vagrantfile
   # Provisioning script
   config.vm.provision "shell", path: "provisioning.sh", env: {
     "TIMEZONE" => "Europe/Paris", # Timezone to be used by the system and PHP
-    "PHP_VERSION" => "8.2", # PHP version to use (currently : 7.4, 8.0, 8.1, 8.2, 8.3, 8.4)
+    "MARIADB_VERSION" => "10.6", # MariaDB version to use (currently : 10.6, 10.11, 11.4, 11.8, 12.1)
+    "PHP_VERSION" => "8.4", # PHP version to use (currently : 7.4, 8.0, 8.1, 8.2, 8.3, 8.4)
+    "PHP_FRAMEWORK" => "", # PHP framework used to configure the web server accordingly (cakephp, laravel, symfony or nothing)
     "PHP_ERROR_REPORTING" => "E_ALL", # Sets which PHP errors are reported
     "PHP_DISPLAY_ERRORS" => "On", # This determines whether errors should be printed to the screen as part of the output
     "PHP_DISPLAY_STARTUP_ERRORS" => "On", #Even when display_errors is on, errors that occur during PHP's startup sequence are not displayed
@@ -48,7 +50,7 @@ This LAMP environment must be started using Vagrant.
     default: Cleaning dnf cache...
     default: Updating the system...
     default: Installing LAMP...
-    default: Installing Composer...    
+    default: Installing Composer...
     default: Configuring Apache/httpd...
     default: Configuring MariaDB...
     default: Configuring PHP...
@@ -57,11 +59,11 @@ This LAMP environment must be started using Vagrant.
     default: Starting LAMP...
     default:
     default: LAMP is ready !
-    default: - Apache/httpd version : 2.4.57
-    default: - MariaDB version : 10.5.22
-    default: - PHP version : 8.2.16
-    default: - phpMyAdmin version : 5.2.1
-    default: - Composer version : 2.7.1    
+    default: - Apache/httpd version : 2.4.62
+    default: - MariaDB version : 10.6.24
+    default: - PHP version : 8.4.16
+    default: - phpMyAdmin version : 5.2.3
+    default: - Composer version : 2.9.2
     default:
     default: Informations :
     default: - Web server URL : http://127.0.0.1/

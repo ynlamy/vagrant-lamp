@@ -9,8 +9,10 @@ echo "Disbaling SELinux..."
 setenforce 0
 sed -i 's/SELINUX=\(enforcing\|permissive\)/SELINUX=disabled/' /etc/selinux/config
 
-echo "Configuring Timezone..."
-timedatectl set-timezone $TIMEZONE
+if [ -n "$TIMEZONE" ]; then
+  echo "Configuring Timezone..."
+  timedatectl set-timezone $TIMEZONE
+fi
 
 echo "Cleaning dnf cache..."
 dnf -y -q clean all &>/dev/null
@@ -22,6 +24,19 @@ echo "Installing LAMP..."
 dnf -y -q install epel-release &>/dev/null
 dnf -y -q install https://rpms.remirepo.net/enterprise/remi-release-9.rpm &>/dev/null
 crb enable &>/dev/null
+if [ -z "$MARIADB_VERSION" ]; then
+  MARIADB_VERSION="10.6"
+fi
+if [ -z "$PHP_VERSION" ]; then
+  PHP_VERSION="8.4"
+fi
+echo "
+[mariadb]
+name = MariaDB
+baseurl = https://rpm.mariadb.org/$MARIADB_VERSION/rhel/\$releasever/\$basearch
+gpgkey = https://rpm.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck = 1
+enabled = 1" > /etc/yum.repos.d/mariadb.repo
 dnf -y -q module enable php:remi-$PHP_VERSION &>/dev/null
 dnf -y -q install mariadb-server httpd php php-bz2 php-gd php-intl php-mbstring php-mysqlnd php-ldap php-zip php-xdebug phpMyAdmin &>/dev/null
 
@@ -37,10 +52,27 @@ mv /etc/httpd/conf.d/welcome.conf /etc/httpd/conf.d/welcome.conf.bak
 mv /etc/httpd/conf.d/userdir.conf /etc/httpd/conf.d/userdir.conf.bak
 sed -i 's/ScriptAlias \/cgi-bin\/ .*/#ScriptAlias \/cgi-bin\/ "\/var\/www\/cgi-bin\/"/' /etc/httpd/conf/httpd.conf
 sed -i '/^<Directory \"\/var\/www\/cgi-bin\">$/,/<\/Directory>/ { s/^[^#]/#&/}' /etc/httpd/conf/httpd.conf
-rm -fr /var/www/cgi-bin
+rm -fr /var/www/cgi-bin/
 
-echo "Configuring MariaDB..."
-sed -i 's/#bind-address.*/bind-address = 0.0.0.0/' /etc/my.cnf.d/mariadb-server.cnf
+if [ "$PHP_FRAMEWORK" == "cakephp" ]; then
+  echo "Configuring Apache/httpd for PHP framework (CakePHP)..."
+  sed -i 's#DocumentRoot \"\/var\/www\/html\"#DocumentRoot \"\/var\/www\/html\/webroot\"#' /etc/httpd/conf/httpd.conf
+  sed -i 's#<Directory \"\/var\/www\/html\"#<Directory \"\/var\/www\/html\/webroot\"#' /etc/httpd/conf/httpd.conf
+  sed -i '/<Directory "\/var\/www\/html\/webroot">/,/<\/Directory>/s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
+  mkdir -p /var/www/html/webroot/
+elif [ "$PHP_FRAMEWORK" == "laravel" ]; then
+  echo "Configuring Apache/httpd for PHP framework (Laravel)..."
+  sed -i 's#DocumentRoot \"\/var\/www\/html\"#DocumentRoot \"\/var\/www\/html\/public\"#' /etc/httpd/conf/httpd.conf
+  sed -i 's#<Directory \"\/var\/www\/html\"#<Directory \"\/var\/www\/html\/public\"#' /etc/httpd/conf/httpd.conf
+  sed -i '/<Directory "\/var\/www\/html\/public">/,/<\/Directory>/s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
+  mkdir -p /var/www/html/public/
+elif [ "$PHP_FRAMEWORK" == "symfony" ]; then
+  echo "Configuring Apache/httpd for PHP framework (Symfony)..."
+  sed -i 's#DocumentRoot \"\/var\/www\/html\"#DocumentRoot \"\/var\/www\/html\/public\"#' /etc/httpd/conf/httpd.conf
+  sed -i 's#<Directory \"\/var\/www\/html\"#<Directory \"\/var\/www\/html\/public\"#' /etc/httpd/conf/httpd.conf
+  sed -i '/<Directory "\/var\/www\/html\/public">/,/<\/Directory>/s#</Directory>#    FallbackResource /index.php\n</Directory>#' /etc/httpd/conf/httpd.conf
+  mkdir -p /var/www/html/public/
+fi
 
 echo "Configuring PHP..."
 sed -i "s/error_reporting = .*/error_reporting = ${PHP_ERROR_REPORTING}/" /etc/php.ini
@@ -57,7 +89,7 @@ sed -i "s/;xdebug.start_with_request = .*/xdebug.start_with_request = ${PHP_XDEB
 
 echo "Configuring phpinfo..."
 echo -e "Alias /phpinfo /usr/share/phpinfo\n\n<Directory /usr/share/phpinfo>\n  Require all granted\n</Directory>" > /etc/httpd/conf.d/phpinfo.conf
-mkdir /usr/share/phpinfo
+mkdir /usr/share/phpinfo/
 echo "<?php phpinfo(); ?>" > /usr/share/phpinfo/index.php
 
 echo "Configuring phpMyAdmin..."
@@ -67,20 +99,23 @@ sed -i 's/Require local.*/Require all denied/' /etc/httpd/conf.d/phpMyAdmin.conf
 sed -i "s/\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = .*/\$cfg\['Servers'\]\[\$i\]\['AllowNoPassword'\] = true;/" /etc/phpMyAdmin/config.inc.php
 echo "\$cfg['PmaNoRelation_DisableWarning'] = true;" >> /etc/phpMyAdmin/config.inc.php
 
-echo "Starting LAMP..."
+echo "Configuring MariaDB..."
+sed -i 's/#bind-address.*/bind-address = 0.0.0.0/' /etc/my.cnf.d/server.cnf
 systemctl enable --now mariadb &>/dev/null
-echo -e "\nn\nn\nY\nn\nY\nY\n" | mysql_secure_installation &>/dev/null
+echo -e "\nn\nn\nY\nn\nY\nY\n" | mariadb-secure-installation &>/dev/null
 mariadb -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('');"
 mariadb -e "RENAME USER 'root'@'localhost' TO 'root'@'%';"
 mariadb -e "FLUSH PRIVILEGES;"
+
+echo "Starting LAMP..."
 systemctl enable --now httpd &>/dev/null
 
 echo -e "\nLAMP is ready !"
-echo "- Apache/httpd version :" `dnf info httpd | grep -i "Version" | awk '{ print $3 }'`
-echo "- MariaDB version :" `dnf info mariadb-server | grep -i "Version" | awk '{ print $3 }'`
-echo "- PHP version :" `dnf info php | grep -i "Version" | awk '{ print $3 }'`
-echo "- phpMyAdmin version :" `dnf info phpMyAdmin | grep -i "Version" | awk '{ print $3 }'`
-echo "- Composer version :" `/usr/local/bin/composer -V 2> /dev/null | grep -i "Composer version" | awk '{ print $3 }'`
+echo "- Apache/httpd version :" `dnf info --installed httpd | grep -i "Version" | awk '{ print $3 }'`
+echo "- MariaDB version :" `dnf info --installed mariadb-server | grep -i -m 1 "Version" | awk '{ print $3 }'`
+echo "- PHP version :" `dnf info --installed php | grep -i "Version" | awk '{ print $3 }'`
+echo "- phpMyAdmin version :" `dnf info --installed phpMyAdmin | grep -i "Version" | awk '{ print $3 }'`
+echo "- Composer version :" `/usr/local/bin/composer -V 2>/dev/null | grep -i "Composer version" | awk '{ print $3 }'`
 echo -e "\nInformations :"
 echo "- Web server URL : http://127.0.0.1/"
 echo "- phpinfo URL : http://127.0.0.1/phpinfo/"
