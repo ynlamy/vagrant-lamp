@@ -33,7 +33,7 @@ fi
 echo "
 [mariadb]
 name = MariaDB
-baseurl = https://rpm.mariadb.org/$MARIADB_VERSION/rhel/\$releasever/\$basearch
+baseurl = https://rpm.mariadb.org/${MARIADB_VERSION}/rhel/\$releasever/\$basearch
 gpgkey = https://rpm.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgcheck = 1
 enabled = 1" > /etc/yum.repos.d/mariadb.repo
@@ -75,17 +75,39 @@ elif [ "$PHP_FRAMEWORK" == "symfony" ]; then
 fi
 
 echo "Configuring PHP..."
-sed -i "s/error_reporting = .*/error_reporting = ${PHP_ERROR_REPORTING}/" /etc/php.ini
-sed -i "s/display_errors = .*/display_errors = ${PHP_DISPLAY_ERRORS}/" /etc/php.ini
-sed -i "s/display_startup_errors = .*/display_startup_errors = ${PHP_DISPLAY_STARTUP_ERRORS}/" /etc/php.ini
-sed -i "s/memory_limit = .*/memory_limit = ${PHP_MEMORY_LIMIT}/" /etc/php.ini
-sed -i "s/upload_max_filesize = .*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" /etc/php.ini
-sed -i "s/post_max_size = .*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php.ini
-sed -i "s/max_execution_time = .*/max_execution_time = ${PHP_MAX_EXECUTION_TIME}/" /etc/php.ini
-sed -i "s#;date.timezone .*#date.timezone = ${TIMEZONE}#" /etc/php.ini
-sed -i "s/;xdebug.mode = .*/xdebug.mode = ${PHP_XDEBUG_MODE}/" /etc/php.d/15-xdebug.ini
-sed -i "s/;xdebug.client_host = .*/xdebug.client_host = ${PHP_XDEBUG_CLIENT_HOST}/" /etc/php.d/15-xdebug.ini
-sed -i "s/;xdebug.start_with_request = .*/xdebug.start_with_request = ${PHP_XDEBUG_START_WITH_REQUEST}/" /etc/php.d/15-xdebug.ini
+if [ -n "$PHP_ERROR_REPORTING" ]; then
+  sed -i "s/error_reporting = .*/error_reporting = ${PHP_ERROR_REPORTING}/" /etc/php.ini
+fi
+if [ -n "$PHP_DISPLAY_ERRORS" ]; then
+  sed -i "s/display_errors = .*/display_errors = ${PHP_DISPLAY_ERRORS}/" /etc/php.ini
+fi
+if [ -n "$PHP_DISPLAY_STARTUP_ERRORS" ]; then
+  sed -i "s/display_startup_errors = .*/display_startup_errors = ${PHP_DISPLAY_STARTUP_ERRORS}/" /etc/php.ini
+fi
+if [ -n "$PHP_MEMORY_LIMIT" ]; then
+  sed -i "s/memory_limit = .*/memory_limit = ${PHP_MEMORY_LIMIT}/" /etc/php.ini
+fi
+if [ -n "$PHP_UPLOAD_MAX_FILESIZE" ]; then
+  sed -i "s/upload_max_filesize = .*/upload_max_filesize = ${PHP_UPLOAD_MAX_FILESIZE}/" /etc/php.ini
+fi
+if [ -n "$PHP_POST_MAX_SIZE" ]; then
+  sed -i "s/post_max_size = .*/post_max_size = ${PHP_POST_MAX_SIZE}/" /etc/php.ini
+fi
+if [ -n "$PHP_MAX_EXECUTION_TIME" ]; then
+  sed -i "s/max_execution_time = .*/max_execution_time = ${PHP_MAX_EXECUTION_TIME}/" /etc/php.ini
+fi
+if [ -n "$TIMEZONE" ]; then
+  sed -i "s#;date.timezone .*#date.timezone = ${TIMEZONE}#" /etc/php.ini
+fi
+if [ -n "$PHP_XDEBUG_MODE" ]; then
+  sed -i "s/;xdebug.mode = .*/xdebug.mode = ${PHP_XDEBUG_MODE}/" /etc/php.d/15-xdebug.ini
+fi
+if [ -n "$PHP_XDEBUG_CLIENT_HOST" ]; then
+  sed -i "s/;xdebug.client_host = .*/xdebug.client_host = ${PHP_XDEBUG_CLIENT_HOST}/" /etc/php.d/15-xdebug.ini
+fi
+if [ -n "$PHP_XDEBUG_START_WITH_REQUEST" ]; then
+  sed -i "s/;xdebug.start_with_request = .*/xdebug.start_with_request = ${PHP_XDEBUG_START_WITH_REQUEST}/" /etc/php.d/15-xdebug.ini
+fi
 
 echo "Configuring phpinfo..."
 echo -e "Alias /phpinfo /usr/share/phpinfo\n\n<Directory /usr/share/phpinfo>\n  Require all granted\n</Directory>" > /etc/httpd/conf.d/phpinfo.conf
