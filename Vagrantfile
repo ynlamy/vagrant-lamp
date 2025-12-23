@@ -46,7 +46,7 @@ Vagrant.configure("2") do |config|
     "TIMEZONE" => "Europe/Paris", # Timezone to be used by the system and PHP
     "MARIADB_VERSION" => "10.6", # MariaDB version to use (currently : 10.6, 10.11, 11.4, 11.8, 12.1)
     "PHP_VERSION" => "8.4", # PHP version to use (currently : 7.4, 8.0, 8.1, 8.2, 8.3, 8.4, 8.5)
-    "PHP_FRAMEWORK" => "symfony", # PHP framework used to configure the web server accordingly (cakephp, laravel, symfony or nothing)
+    "PHP_FRAMEWORK" => "", # PHP framework used to configure the web server accordingly (cakephp, laravel, symfony or nothing)
     "PHP_ERROR_REPORTING" => "E_ALL", # Sets which PHP errors are reported
     "PHP_DISPLAY_ERRORS" => "On", # This determines whether errors should be printed to the screen as part of the output
     "PHP_DISPLAY_STARTUP_ERRORS" => "On", #Even when display_errors is on, errors that occur during PHP's startup sequence are not displayed
